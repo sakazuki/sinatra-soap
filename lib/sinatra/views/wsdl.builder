@@ -12,12 +12,17 @@ xml.definitions 'xmlns' => 'http://schemas.xmlsoap.org/wsdl/',
     xml.tag! "schema", :targetNamespace => settings.namespace, :xmlns => 'http://www.w3.org/2001/XMLSchema' do
       defined = []
       wsdl.each do |operation, formats|
+        xml.element :name => "operation" do
+          xml.comlex
+        end
         formats[:in]||={}
         formats[:out]||={}
         formats[:in].each do |p|
+          xml.element(:name => p[0], :type => "tns:#{p[0]}")
           wsdl_type xml, p, defined
         end
         formats[:out].each do |p|
+          xml.element(:name => p[0], :type => "tns:#{p[0]}")
           wsdl_type xml, p, defined
         end
       end
@@ -60,6 +65,7 @@ xml.definitions 'xmlns' => 'http://schemas.xmlsoap.org/wsdl/',
 
   wsdl.each do |operation, formats|
     xml.message :name => "#{operation}" do
+      xml.part :name => "parameters", :element => "#{operation}"
       formats[:in] ||= []
       formats[:in].each do |p|
         xml.part wsdl_occurence(p, false)
@@ -67,6 +73,7 @@ xml.definitions 'xmlns' => 'http://schemas.xmlsoap.org/wsdl/',
       end
     end
     xml.message :name => "#{operation}Response" do
+      xml.part :name => "parameters", :element => "#{operation}Response"
       formats[:out] ||= []
       formats[:out].each do |p|
         xml.part wsdl_occurence(p, false)
